@@ -44,11 +44,19 @@
         ></textarea>
 
         <button type="submit" id="bulkSubmit" class="bulk-button">
-          Send
+          Confirm
         </button>
       </form>
 
       <div id="bulkMessage" class="bulk-message" aria-live="polite"></div>
+
+      <section id="bulkPreviewBox" class="bulk-preview-box" hidden>
+        <p class="bulk-preview-title">送信確認</p>
+        <p class="bulk-preview-line">
+          対象件数: <span id="bulkPreviewTotal">0</span>
+        </p>
+        <div id="bulkPreviewList" class="bulk-preview-list"></div>
+      </section>
 
       <section id="bulkResult" class="bulk-result" hidden>
         <p>Total: <span id="bulkTotal">0</span></p>

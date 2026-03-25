@@ -6,14 +6,14 @@
 
 :root {
   --bg: #000;
-  --panel: rgba(255,255,255,0.04);
-  --line: rgba(255,255,255,0.14);
-  --line-strong: rgba(255,255,255,0.28);
-  --text: rgba(255,255,255,0.92);
-  --muted: rgba(255,255,255,0.58);
+  --panel: rgba(255, 255, 255, 0.04);
+  --line: rgba(255, 255, 255, 0.14);
+  --line-strong: rgba(255, 255, 255, 0.28);
+  --text: rgba(255, 255, 255, 0.92);
+  --muted: rgba(255, 255, 255, 0.58);
   --error: #ff8d8d;
   --success: #d6f5d6;
-  --font: "Helvetica Neue","Yu Gothic","Hiragino Kaku Gothic ProN","Noto Sans JP",sans-serif;
+  --font: "Helvetica Neue", "Yu Gothic", "Hiragino Kaku Gothic ProN", "Noto Sans JP", sans-serif;
 }
 
 html,
@@ -23,6 +23,7 @@ body {
   background: var(--bg);
   color: var(--text);
   font-family: var(--font);
+  -webkit-text-size-adjust: 100%;
 }
 
 .bulk-page {
@@ -121,18 +122,34 @@ body {
   color: var(--muted);
 }
 
-.bulk-message.is-error {
-  color: var(--error);
-}
-
-.bulk-message.is-success {
-  color: var(--success);
-}
-
+.bulk-preview-box,
 .bulk-result {
   margin-top: 16px;
   padding: 16px;
   border: 1px solid var(--line);
   background: var(--panel);
+}
+
+.bulk-preview-title {
+  margin: 0 0 10px;
+  font-size: 14px;
+  color: var(--text);
+}
+
+.bulk-preview-line {
+  margin: 0 0 10px;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.bulk-preview-list {
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.7;
+  word-break: break-all;
+  white-space: pre-wrap;
+}
+
+.bulk-result {
   color: var(--muted);
 }
