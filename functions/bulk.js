@@ -1,104 +1,68 @@
 (() => {
-  "use strict";
-
   const form = document.getElementById("bulkForm");
-  const passwordInput = document.getElementById("bulkPassword");
-  const subjectInput = document.getElementById("bulkSubject");
-  const textInput = document.getElementById("bulkText");
-  const submitButton = document.getElementById("bulkSubmit");
   const message = document.getElementById("bulkMessage");
   const result = document.getElementById("bulkResult");
+
   const total = document.getElementById("bulkTotal");
   const success = document.getElementById("bulkSuccess");
   const fail = document.getElementById("bulkFail");
 
-  if (!form) return;
+  const password = document.getElementById("bulkPassword");
+  const subject = document.getElementById("bulkSubject");
+  const text = document.getElementById("bulkText");
 
-  form.addEventListener("submit", async (event) => {
-    event.preventDefault();
+  let confirmed = false;
 
-    const password = passwordInput.value.trim();
-    const subject = subjectInput.value.trim();
-    const text = textInput.value.trim();
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
 
-    clearMessage();
-    result.hidden = true;
-
-    if (!password) {
-      setMessage("password を入力してください。", "error");
-      return;
-    }
-
-    if (!subject) {
-      setMessage("件名を入力してください。", "error");
-      return;
-    }
-
-    if (!text) {
-      setMessage("本文を入力してください。", "error");
-      return;
-    }
-
-    setLoading(true);
-    setMessage("送信中...", "");
-
-    try {
-      const response = await fetch("/api/bulk-send", {
+    if (!confirmed) {
+      // プレビュー
+      const res = await fetch("/api/bulk-preview", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Accept": "application/json"
-        },
         body: JSON.stringify({
-          password,
-          subject,
-          text
+          password: password.value
         })
       });
 
-      const data = await response.json().catch(() => null);
+      const data = await res.json();
 
-      if (!response.ok || !data?.ok) {
-        setMessage(data?.message || "一斉送信に失敗しました。", "error");
+      if (!data.ok) {
+        message.textContent = data.message;
         return;
       }
 
-      total.textContent = String(data.total || 0);
-      success.textContent = String(data.successCount || 0);
-      fail.textContent = String(data.failCount || 0);
-      result.hidden = false;
+      message.textContent =
+        `送信対象 ${data.total} 件\n本当に送るならもう一度押す`;
 
-      setMessage("一斉送信が完了しました。", "success");
-    } catch (error) {
-      setMessage("通信に失敗しました。", "error");
-    } finally {
-      setLoading(false);
+      confirmed = true;
+      return;
     }
+
+    // 送信
+    const res = await fetch("/api/bulk-send", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        password: password.value,
+        subject: subject.value,
+        text: text.value,
+        confirmed: true
+      })
+    });
+
+    const data = await res.json();
+
+    if (!data.ok) {
+      message.textContent = data.message;
+      return;
+    }
+
+    result.hidden = false;
+    total.textContent = data.total;
+    success.textContent = data.success;
+    fail.textContent = data.fail;
+
+    message.textContent = "送信完了";
   });
-
-  function setLoading(isLoading) {
-    submitButton.disabled = isLoading;
-    passwordInput.disabled = isLoading;
-    subjectInput.disabled = isLoading;
-    textInput.disabled = isLoading;
-    submitButton.textContent = isLoading ? "Sending..." : "Send";
-  }
-
-  function setMessage(text, type = "") {
-    message.textContent = text;
-    message.className = "bulk-message";
-
-    if (type === "error") {
-      message.classList.add("is-error");
-    }
-
-    if (type === "success") {
-      message.classList.add("is-success");
-    }
-  }
-
-  function clearMessage() {
-    message.textContent = "";
-    message.className = "bulk-message";
-  }
 })();

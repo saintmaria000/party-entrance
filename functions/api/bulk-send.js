@@ -9,46 +9,26 @@ export async function onRequest(context) {
     return new Response("Method Not Allowed", { status: 405 });
   }
 
-  return handleBulkSend(context);
+  return handleSend(context);
 }
 
-async function handleBulkSend({ request, env }) {
+async function handleSend({ request, env }) {
   try {
-    if (!env.ENTRIES) {
+    if (!env.ENTRIES || !env.RESEND_API_KEY || !env.FROM_EMAIL) {
       return jsonResponse(
-        { ok: false, message: "ENTRIES(KV) が未設定です。" },
+        { ok: false, message: "環境変数不足" },
         500
       );
     }
 
-    if (!env.RESEND_API_KEY) {
-      return jsonResponse(
-        { ok: false, message: "RESEND_API_KEY が未設定です。" },
-        500
-      );
-    }
+    const adminPassword = String(env.ADMIN_PASSWORD || "").trim();
 
     const body = await request.json().catch(() => null);
-
-    if (!body) {
-      return jsonResponse(
-        { ok: false, message: "リクエストが不正です。" },
-        400
-      );
-    }
 
     const password = String(body?.password || "").trim();
     const subject = String(body?.subject || "").trim();
     const text = String(body?.text || "").trim();
-
-    const adminPassword = String(env.ADMIN_PASSWORD || "admin1234").trim();
-
-    if (!password) {
-      return jsonResponse(
-        { ok: false, message: "password を入力してください。" },
-        401
-      );
-    }
+    const confirmed = Boolean(body?.confirmed);
 
     if (password !== adminPassword) {
       return jsonResponse(
@@ -57,16 +37,16 @@ async function handleBulkSend({ request, env }) {
       );
     }
 
-    if (!subject) {
+    if (!subject || !text) {
       return jsonResponse(
-        { ok: false, field: "subject", message: "件名を入力してください。" },
+        { ok: false, message: "件名・本文が必要です。" },
         400
       );
     }
 
-    if (!text) {
+    if (!confirmed) {
       return jsonResponse(
-        { ok: false, field: "text", message: "本文を入力してください。" },
+        { ok: false, message: "確認チェックが必要です。" },
         400
       );
     }
@@ -80,69 +60,42 @@ async function handleBulkSend({ request, env }) {
 
       try {
         const parsed = JSON.parse(raw);
-        const email = String(parsed?.email || "").trim().toLowerCase();
-        if (email) {
-          emails.push(email);
+        if (parsed?.email && parsed?.subscribed !== false) {
+          emails.push(parsed.email);
         }
-      } catch (_) {
-        // ignore
-      }
+      } catch (_) {}
     }
 
     const uniqueEmails = [...new Set(emails)];
 
-    if (!uniqueEmails.length) {
-      return jsonResponse(
-        { ok: false, message: "送信対象のメールアドレスがありません。" },
-        400
-      );
-    }
-
-    const FROM_EMAIL =
-      env.FROM_EMAIL || "Party Entrance <noreply@yourdomain.com>";
-
-    const html =
-      `<div style="white-space:pre-wrap;">${escapeHtml(text)}</div>`;
-
-    const results = [];
-    let successCount = 0;
-    let failCount = 0;
+    let success = 0;
+    let fail = 0;
 
     for (const email of uniqueEmails) {
       const result = await resendEmail(env.RESEND_API_KEY, {
-        from: FROM_EMAIL,
+        from: env.FROM_EMAIL,
         to: [email],
         subject,
         text,
-        html
+        html: `<div style="white-space:pre-wrap;">${escapeHtml(text)}</div>`
       });
 
-      if (result.ok) {
-        successCount += 1;
-      } else {
-        failCount += 1;
-      }
-
-      results.push({
-        email,
-        ok: result.ok,
-        status: result.status
-      });
+      if (result.ok) success++;
+      else fail++;
     }
 
     return jsonResponse(
       {
         ok: true,
         total: uniqueEmails.length,
-        successCount,
-        failCount,
-        results
+        success,
+        fail
       },
       200
     );
-  } catch (error) {
+  } catch {
     return jsonResponse(
-      { ok: false, message: "一斉送信に失敗しました。" },
+      { ok: false, message: "送信失敗" },
       500
     );
   }

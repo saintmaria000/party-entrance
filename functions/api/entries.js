@@ -21,6 +21,15 @@ async function handleList({ env, request }) {
       );
     }
 
+    const adminPassword = String(env.ADMIN_PASSWORD || "").trim();
+
+    if (!adminPassword) {
+      return jsonResponse(
+        { ok: false, message: "ADMIN_PASSWORD が未設定です。" },
+        500
+      );
+    }
+
     const url = new URL(request.url);
     const password = String(url.searchParams.get("password") || "").trim();
 
@@ -31,7 +40,7 @@ async function handleList({ env, request }) {
       );
     }
 
-    if (password !== "admin1234") {
+    if (password !== adminPassword) {
       return jsonResponse(
         { ok: false, message: "Unauthorized" },
         401
@@ -48,9 +57,7 @@ async function handleList({ env, request }) {
       try {
         const parsed = JSON.parse(raw);
         entries.push(parsed);
-      } catch (_) {
-        // 壊れたデータは無視
-      }
+      } catch (_) {}
     }
 
     entries.sort((a, b) => {

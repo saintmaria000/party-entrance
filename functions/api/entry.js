@@ -92,6 +92,13 @@ async function handlePost({ request, env }) {
       );
     }
 
+    if (!env.FROM_EMAIL) {
+      return jsonResponse(
+        { ok: false, message: "FROM_EMAIL が未設定です。" },
+        500
+      );
+    }
+
     const ip =
       request.headers.get("CF-Connecting-IP") ||
       request.headers.get("x-forwarded-for") ||
@@ -122,7 +129,7 @@ async function handlePost({ request, env }) {
     }
 
     const ADMIN_TO = "shomacco@gmail.com";
-    const FROM_EMAIL = "Party Entrance <onboarding@resend.dev>";
+    const FROM_EMAIL = env.FROM_EMAIL;
     const REPLY_TO = email;
     const createdAt = new Date().toISOString();
 
@@ -130,7 +137,8 @@ async function handlePost({ request, env }) {
       name,
       email,
       createdAt,
-      ip
+      ip,
+      subscribed: true
     };
 
     await env.ENTRIES.put(entryKey, JSON.stringify(record));
