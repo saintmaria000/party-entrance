@@ -3,193 +3,58 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Entries Admin</title>
-  <style>
-    * { box-sizing: border-box; }
-    body {
-      margin: 0;
-      padding: 24px;
-      background: #000;
-      color: #fff;
-      font-family: Arial, sans-serif;
-    }
-    .wrap {
-      max-width: 1100px;
-      margin: 0 auto;
-    }
-    h1 {
-      font-size: 24px;
-      margin: 0 0 20px;
-      font-weight: 600;
-    }
-    .bar {
-      display: flex;
-      gap: 12px;
-      flex-wrap: wrap;
-      margin-bottom: 20px;
-    }
-    input, button {
-      height: 44px;
-      border: 1px solid rgba(255,255,255,.3);
-      background: transparent;
-      color: #fff;
-      padding: 0 14px;
-      font-size: 14px;
-    }
-    input {
-      min-width: 260px;
-    }
-    button {
-      cursor: pointer;
-    }
-    .msg {
-      margin: 12px 0 20px;
-      color: rgba(255,255,255,.72);
-      min-height: 1.4em;
-    }
-    .table-wrap {
-      overflow-x: auto;
-      border: 1px solid rgba(255,255,255,.2);
-    }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      min-width: 760px;
-      background: rgba(255,255,255,.02);
-    }
-    th, td {
-      text-align: left;
-      padding: 14px;
-      border-bottom: 1px solid rgba(255,255,255,.12);
-      vertical-align: top;
-      font-size: 14px;
-    }
-    th {
-      color: rgba(255,255,255,.7);
-      font-weight: 600;
-    }
-    .muted {
-      color: rgba(255,255,255,.56);
-    }
-    .empty {
-      padding: 24px 14px;
-      color: rgba(255,255,255,.56);
-    }
-  </style>
+  <title>Party Entrance | Admin</title>
+  <link rel="stylesheet" href="./admin.css" />
 </head>
 <body>
-  <main class="wrap">
-    <h1>Entry List</h1>
+  <main class="admin-page">
+    <section class="admin-panel">
+      <header class="admin-header">
+        <p class="admin-eyebrow">Party Entrance</p>
+        <h1 class="admin-title">Entries</h1>
+        <p class="admin-description">
+          登録一覧を確認します。
+        </p>
+      </header>
 
-    <div class="bar">
-      <input id="password" type="password" placeholder="admin password" />
-      <button id="loadBtn" type="button">Load entries</button>
-    </div>
+      <form id="adminLoginForm" class="admin-login-form">
+        <label class="admin-label" for="adminPassword">Password</label>
+        <div class="admin-login-row">
+          <input
+            id="adminPassword"
+            class="admin-input"
+            type="password"
+            name="password"
+            placeholder="password"
+            autocomplete="current-password"
+          />
+          <button type="submit" class="admin-button">Load</button>
+        </div>
+      </form>
 
-    <p id="message" class="msg"></p>
+      <div id="adminMessage" class="admin-message" aria-live="polite"></div>
 
-    <div class="table-wrap">
-      <table>
-        <thead>
-          <tr>
-            <th style="width: 22%;">Name</th>
-            <th style="width: 28%;">Email</th>
-            <th style="width: 28%;">Created At</th>
-            <th style="width: 22%;">IP</th>
-          </tr>
-        </thead>
-        <tbody id="entriesBody">
-          <tr>
-            <td colspan="4" class="empty">まだ読み込んでいません。</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
+      <section id="adminSummary" class="admin-summary" hidden>
+        <p>Total: <span id="totalCount">0</span></p>
+      </section>
+
+      <section id="adminTableWrap" class="admin-table-wrap" hidden>
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th>No.</th>
+              <th>Name</th>
+              <th>Mail</th>
+              <th>Time</th>
+              <th>IP</th>
+            </tr>
+          </thead>
+          <tbody id="adminTableBody"></tbody>
+        </table>
+      </section>
+    </section>
   </main>
 
-  <script>
-    (() => {
-      "use strict";
-
-      const passwordInput = document.getElementById("password");
-      const loadBtn = document.getElementById("loadBtn");
-      const message = document.getElementById("message");
-      const entriesBody = document.getElementById("entriesBody");
-
-      function escapeHtml(value) {
-        return String(value ?? "")
-          .replaceAll("&", "&amp;")
-          .replaceAll("<", "&lt;")
-          .replaceAll(">", "&gt;")
-          .replaceAll('"', "&quot;")
-          .replaceAll("'", "&#039;");
-      }
-
-      function formatDate(value) {
-        if (!value) return "";
-        const date = new Date(value);
-        if (Number.isNaN(date.getTime())) return String(value);
-        return date.toLocaleString("ja-JP");
-      }
-
-      function setMessage(text) {
-        message.textContent = text || "";
-      }
-
-      function renderRows(entries) {
-        if (!entries.length) {
-          entriesBody.innerHTML = `
-            <tr>
-              <td colspan="4" class="empty">データがありません。</td>
-            </tr>
-          `;
-          return;
-        }
-
-        entriesBody.innerHTML = entries.map((item) => {
-          return `
-            <tr>
-              <td>${escapeHtml(item.name)}</td>
-              <td>${escapeHtml(item.email)}</td>
-              <td>${escapeHtml(formatDate(item.createdAt))}</td>
-              <td class="muted">${escapeHtml(item.ip || "")}</td>
-            </tr>
-          `;
-        }).join("");
-      }
-
-      async function loadEntries() {
-        const password = passwordInput.value.trim();
-
-        if (!password) {
-          setMessage("パスワードを入力してください。");
-          return;
-        }
-
-        setMessage("読み込み中...");
-
-        try {
-          const res = await fetch(`/api/entries?password=${encodeURIComponent(password)}`);
-          const data = await res.json().catch(() => ({}));
-
-          if (!res.ok || data.ok === false) {
-            throw new Error(data.message || "読み込みに失敗しました。");
-          }
-
-          renderRows(Array.isArray(data.entries) ? data.entries : []);
-          setMessage(`${data.entries.length}件読み込みました。`);
-        } catch (error) {
-          entriesBody.innerHTML = `
-            <tr>
-              <td colspan="4" class="empty">読み込みに失敗しました。</td>
-            </tr>
-          `;
-          setMessage(error.message || "読み込みに失敗しました。");
-        }
-      }
-
-      loadBtn.addEventListener("click", loadEntries);
-    })();
-  </script>
+  <script src="./admin.js" defer></script>
 </body>
 </html>
