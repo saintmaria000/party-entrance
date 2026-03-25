@@ -1,7 +1,12 @@
 export async function onRequest(context) {
   const { request } = context;
+  const url = new URL(request.url);
 
   if (request.method === "GET") {
+    if (url.pathname === "/api/entries") {
+      return handleList(context);
+    }
+
     return new Response(
       JSON.stringify({ ok: true, route: "/api/entry", method: "GET" }),
       {
@@ -12,7 +17,11 @@ export async function onRequest(context) {
   }
 
   if (request.method === "POST") {
-    return handlePost(context);
+    if (url.pathname === "/api/entry") {
+      return handlePost(context);
+    }
+
+    return json({ ok: false, message: "Not Found" }, 404);
   }
 
   return new Response("Method Not Allowed", {
@@ -81,7 +90,7 @@ async function handlePost({ request, env }) {
     const existing = await env.ENTRIES.get(entryKey);
 
     if (existing) {
-      return json({ ok: true }, 200);
+      return json({ ok: true, duplicated: true }, 200);
     }
 
     const ADMIN_TO = "shomacco@gmail.com";
@@ -89,10 +98,14 @@ async function handlePost({ request, env }) {
     const REPLY_TO = email;
     const createdAt = new Date().toISOString();
 
-    await env.ENTRIES.put(
-      entryKey,
-      JSON.stringify({ name, email, createdAt, ip })
-    );
+    const record = {
+      name,
+      email,
+      createdAt,
+      ip
+    };
+
+    await env.ENTRIES.put(entryKey, JSON.stringify(record));
 
     const adminResult = await sendEmail(env.RESEND_API_KEY, {
       from: FROM_EMAIL,
@@ -138,6 +151,56 @@ async function handlePost({ request, env }) {
     return json({ ok: true }, 200);
   } catch (error) {
     return json({ ok: false, message: "送信に失敗しました。時間をおいて再度お試しください。" }, 500);
+  }
+}
+
+async function handleList({ env, request }) {
+  try {
+    if (!env.ENTRIES) {
+      return json({ ok: false, message: "ENTRIES(KV) が未設定です。" }, 500);
+    }
+
+    // 簡易保護
+    const url = new URL(request.url);
+    const password = String(url.searchParams.get("password") || "").trim();
+
+    if (!password) {
+      return json({ ok: false, message: "password が必要です。" }, 401);
+    }
+
+    if (password !== "admin1234") {
+      return json({ ok: false, message: "Unauthorized" }, 401);
+    }
+
+    const listed = await env.ENTRIES.list({ prefix: "entry:" });
+    const entries = [];
+
+    for (const item of listed.keys) {
+      const raw = await env.ENTRIES.get(item.name);
+      if (!raw) continue;
+
+      try {
+        const parsed = JSON.parse(raw);
+        entries.push(parsed);
+      } catch (_) {
+        // 壊れたデータは無視
+      }
+    }
+
+    entries.sort((a, b) => {
+      return String(b.createdAt || "").localeCompare(String(a.createdAt || ""));
+    });
+
+    return json(
+      {
+        ok: true,
+        total: entries.length,
+        entries
+      },
+      200
+    );
+  } catch (error) {
+    return json({ ok: false, message: "一覧の取得に失敗しました。" }, 500);
   }
 }
 
