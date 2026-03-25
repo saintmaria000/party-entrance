@@ -1,0 +1,138 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+:root {
+  --bg: #000;
+  --panel: rgba(255,255,255,0.04);
+  --line: rgba(255,255,255,0.14);
+  --line-strong: rgba(255,255,255,0.28);
+  --text: rgba(255,255,255,0.92);
+  --muted: rgba(255,255,255,0.58);
+  --error: #ff8d8d;
+  --success: #d6f5d6;
+  --font: "Helvetica Neue","Yu Gothic","Hiragino Kaku Gothic ProN","Noto Sans JP",sans-serif;
+}
+
+html,
+body {
+  margin: 0;
+  min-height: 100%;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font);
+}
+
+.bulk-page {
+  min-height: 100vh;
+  padding: 40px 20px;
+}
+
+.bulk-panel {
+  width: min(760px, 100%);
+  margin: 0 auto;
+}
+
+.bulk-header {
+  margin-bottom: 28px;
+}
+
+.bulk-eyebrow {
+  margin: 0 0 10px;
+  font-size: 12px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.bulk-title {
+  margin: 0;
+  font-size: 34px;
+  font-weight: 500;
+}
+
+.bulk-description {
+  margin: 10px 0 0;
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.8;
+}
+
+.bulk-form {
+  display: grid;
+  gap: 12px;
+}
+
+.bulk-label {
+  font-size: 12px;
+  letter-spacing: 0.12em;
+  color: var(--muted);
+  text-transform: uppercase;
+}
+
+.bulk-input,
+.bulk-textarea {
+  width: 100%;
+  border: 1px solid var(--line);
+  background: transparent;
+  color: var(--text);
+  font: inherit;
+  outline: none;
+}
+
+.bulk-input {
+  height: 48px;
+  padding: 0 14px;
+}
+
+.bulk-textarea {
+  min-height: 220px;
+  padding: 14px;
+  resize: vertical;
+}
+
+.bulk-input:focus,
+.bulk-textarea:focus {
+  border-color: var(--line-strong);
+}
+
+.bulk-button {
+  height: 48px;
+  margin-top: 8px;
+  border: 1px solid var(--line-strong);
+  background: transparent;
+  color: var(--text);
+  font: inherit;
+  cursor: pointer;
+}
+
+.bulk-button:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
+.bulk-message {
+  min-height: 24px;
+  margin-top: 16px;
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--muted);
+}
+
+.bulk-message.is-error {
+  color: var(--error);
+}
+
+.bulk-message.is-success {
+  color: var(--success);
+}
+
+.bulk-result {
+  margin-top: 16px;
+  padding: 16px;
+  border: 1px solid var(--line);
+  background: var(--panel);
+  color: var(--muted);
+}
