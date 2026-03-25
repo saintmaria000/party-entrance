@@ -7,7 +7,7 @@
      Config
   ========================================================= */
   const CONFIG = {
-    endpoint: "https://party-entrance-api.ukyoiflm.workers.dev/api/entry",
+    endpoint: "https://party-entrance-api.ukiyofilm.workers.dev/",
     method: "POST",
     redirectUrl: "message.html",
     submitTimeout: 15000,
