@@ -1,0 +1,387 @@
+/* =========================================================
+   Reset
+========================================================= */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+/* =========================================================
+   Root
+========================================================= */
+:root {
+  --bg: #000;
+  --text: #fff;
+  --text-soft: rgba(255, 255, 255, 0.72);
+  --text-muted: rgba(255, 255, 255, 0.48);
+  --line-soft: rgba(255, 255, 255, 0.14);
+  --line-strong: rgba(255, 255, 255, 0.22);
+
+  --font-family-base: -apple-system, BlinkMacSystemFont, "Helvetica Neue",
+    "Yu Gothic", "Hiragino Kaku Gothic ProN", "Noto Sans JP", Arial, sans-serif;
+
+  --font-size-copy: 18px;
+  --font-size-body: 16px;
+  --font-size-label: 13px;
+  --font-size-button: 15px;
+
+  --line-height-copy: 1.6;
+  --line-height-body: 1.8;
+
+  --form-width: 1200px;
+  --message-width: 1200px;
+
+  --page-padding-x: 24px;
+  --message-padding-top: 72px;
+  --message-padding-bottom: 80px;
+
+  --message-text-width: 440px;
+  --message-topic-width: 620px;
+  --message-section-gap: 72px;
+  --message-topic-gap: 40px;
+  --message-topic-title-width: 120px;
+  --message-topic-title-size: 12px;
+  --message-topic-title-spacing: 0.16em;
+  --message-body-size: 13px;
+  --message-body-line-height: 2.1;
+  --message-kicker-size: 10px;
+  --message-kicker-spacing: 0.32em;
+}
+
+/* =========================================================
+   Base
+========================================================= */
+html,
+body {
+  min-height: 100%;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-family-base);
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+body {
+  overflow-x: hidden;
+  position: relative;
+}
+
+/* =========================================================
+   Layer
+========================================================= */
+.bg-layer,
+.overlay-layer {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+}
+
+.bg-layer {
+  background:
+    radial-gradient(
+      circle at 50% 12%,
+      rgba(255, 255, 255, 0.05) 0%,
+      rgba(255, 255, 255, 0.015) 18%,
+      rgba(255, 255, 255, 0) 56%
+    ),
+    linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.015) 0%,
+      rgba(255, 255, 255, 0) 16%,
+      rgba(0, 0, 0, 0) 100%
+    );
+  z-index: 0;
+}
+
+.overlay-layer {
+  z-index: 1;
+}
+
+/* =========================================================
+   Page
+========================================================= */
+.page {
+  width: 100%;
+  min-height: 100vh;
+  padding-left: var(--page-padding-x);
+  padding-right: var(--page-padding-x);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  z-index: 2;
+}
+
+/* =========================================================
+   Content
+========================================================= */
+.content {
+  width: 100%;
+  max-width: var(--form-width);
+  min-width: 0;
+}
+
+/* =========================================================
+   Copy
+========================================================= */
+.copy {
+  font-size: var(--font-size-copy);
+  line-height: var(--line-height-copy);
+  text-align: center;
+  white-space: nowrap;
+  margin-bottom: 24px;
+}
+
+/* =========================================================
+   Form
+========================================================= */
+.form {
+  width: 100%;
+}
+
+.field {
+  width: 100%;
+  min-width: 0;
+}
+
+.field + .field {
+  margin-top: 16px;
+}
+
+.field label {
+  display: block;
+  font-size: var(--font-size-label);
+  margin-bottom: 6px;
+}
+
+.field input {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  border: 0;
+  border-bottom: 1px solid var(--text);
+  background: transparent;
+  color: var(--text);
+  font-size: var(--font-size-body);
+  outline: none;
+  padding: 8px 0;
+}
+
+.enter {
+  margin-top: 16px;
+  background: none;
+  border: 0;
+  color: var(--text);
+  font-size: var(--font-size-button);
+  cursor: pointer;
+}
+
+/* =========================================================
+   Message Page Layout
+========================================================= */
+.message-page .page {
+  align-items: flex-start;
+  justify-content: center;
+  padding-top: var(--message-padding-top);
+  padding-bottom: var(--message-padding-bottom);
+}
+
+.message-page .content {
+  max-width: var(--message-width);
+}
+
+.message-page .message-wrap {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: var(--message-section-gap);
+}
+
+/* =========================================================
+   Message Hero
+========================================================= */
+.message-page .message-wrap::before {
+  content: "MESSAGE";
+  display: block;
+  font-size: var(--message-kicker-size);
+  letter-spacing: var(--message-kicker-spacing);
+  color: var(--text-muted);
+  line-height: 1;
+  margin-bottom: -40px;
+}
+
+.message-page .message-wrap::after {
+  content: "";
+  display: block;
+  width: 180px;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.34) 0%,
+    rgba(255, 255, 255, 0.1) 45%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  order: -1;
+  margin-top: 18px;
+  margin-bottom: -10px;
+}
+
+/* =========================================================
+   Message Block
+========================================================= */
+.message-block {
+  width: min(100%, var(--message-text-width));
+}
+
+.message-block p {
+  font-size: var(--message-body-size);
+  line-height: var(--message-body-line-height);
+  letter-spacing: 0.04em;
+  color: var(--text-soft);
+}
+
+.message-block.intro p {
+  color: var(--text);
+}
+
+.message-block.closing {
+  padding-top: 22px;
+  border-top: 1px solid var(--line-soft);
+}
+
+.message-block.closing p {
+  color: rgba(255, 255, 255, 0.82);
+}
+
+/* =========================================================
+   Message Topic
+========================================================= */
+.message-topic {
+  width: min(100%, var(--message-topic-width));
+  display: grid;
+  grid-template-columns: var(--message-topic-title-width) 1fr;
+  column-gap: 34px;
+  align-items: start;
+  padding-top: 18px;
+  border-top: 1px solid var(--line-soft);
+}
+
+.message-topic h2 {
+  font-size: var(--message-topic-title-size);
+  font-weight: 500;
+  line-height: 1.8;
+  letter-spacing: var(--message-topic-title-spacing);
+  color: rgba(255, 255, 255, 0.92);
+}
+
+.message-topic p {
+  font-size: var(--message-body-size);
+  line-height: var(--message-body-line-height);
+  letter-spacing: 0.04em;
+  color: var(--text-soft);
+}
+
+.message-topic p + p {
+  margin-top: 14px;
+}
+
+.message-topic + .message-topic {
+  margin-top: calc(var(--message-topic-gap) - 12px);
+}
+
+/* =========================================================
+   Generic Message Fallback
+========================================================= */
+.message-page .message-block p {
+  font-size: var(--message-body-size);
+  line-height: var(--message-body-line-height);
+}
+
+/* =========================================================
+   Error
+========================================================= */
+.global-error {
+  position: fixed;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  text-align: center;
+  font-size: 12px;
+  z-index: 10;
+}
+
+.error {
+  font-size: 12px;
+}
+
+/* =========================================================
+   Responsive
+========================================================= */
+@media (max-width: 1200px) {
+  :root {
+    --form-width: 100%;
+    --message-width: 100%;
+  }
+}
+
+@media (max-width: 768px) {
+  :root {
+    --message-padding-top: 42px;
+    --message-padding-bottom: 56px;
+    --message-text-width: 100%;
+    --message-topic-width: 100%;
+    --message-section-gap: 56px;
+    --message-topic-gap: 34px;
+    --message-body-size: 12.5px;
+    --message-body-line-height: 2.02;
+    --message-topic-title-size: 11.5px;
+  }
+
+  .copy {
+    white-space: normal;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+  }
+
+  .message-page .message-wrap::before {
+    margin-bottom: -30px;
+  }
+
+  .message-page .message-wrap::after {
+    width: 140px;
+    margin-top: 14px;
+  }
+
+  .message-topic {
+    grid-template-columns: 1fr;
+    row-gap: 10px;
+    column-gap: 0;
+    padding-top: 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  :root {
+    --font-size-copy: 15px;
+    --font-size-body: 14px;
+    --page-padding-x: 16px;
+    --message-padding-top: 32px;
+    --message-padding-bottom: 48px;
+    --message-section-gap: 48px;
+    --message-body-size: 12px;
+    --message-body-line-height: 1.96;
+  }
+
+  .message-page .message-wrap::after {
+    width: 120px;
+  }
+
+  .message-block.closing {
+    padding-top: 18px;
+  }
+}
