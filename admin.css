@@ -211,3 +211,24 @@ body {
     width: 100%;
   }
 }
+.admin-actions {
+  margin-top: 18px;
+}
+
+.admin-link-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  padding: 0 18px;
+  border: 1px solid var(--line-strong);
+  background: transparent;
+  color: var(--text);
+  text-decoration: none;
+  font: inherit;
+  transition: opacity 0.2s ease, border-color 0.2s ease;
+}
+
+.admin-link-button:hover {
+  opacity: 0.82;
+}
